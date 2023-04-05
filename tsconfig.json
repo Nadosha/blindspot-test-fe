@@ -20,10 +20,9 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "@Components": ["src/components/"],
       "@Components/*": ["src/components/*"],
-      "@Utils": ["src/utils/"],
-      "@Utils/*": ["src/utils/"]
+      "@Utils/*": ["src/utils/*"],
+      "@Styles/*": ["src/styles/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
