@@ -1,7 +1,7 @@
 import * as S from './GameStat.styles';
 import {SiTarget} from "react-icons/si";
-import {CustomIcon} from "@Components/UI/GameStat/CustomIcons";
-import {colors} from "@Components/UI/GameStat/GameStat.types";
+import {CustomIcon} from "@UI/GameStat/CustomIcons";
+import {colors} from "@UI/GameStat/GameStat.types";
 
 const GameStatData = [
     {

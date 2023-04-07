@@ -1,6 +1,6 @@
 import {Wrapper} from "@Components/Layout/TopBar/TopBar.styles";
-import UserInfo from "@Components/UI/UserInfo";
-import GameStat from "@Components/UI/GameStat";
+import UserInfo from "@UI/UserInfo";
+import GameStat from "@UI/GameStat";
 
 const TopBar = () => {
     const user = {
