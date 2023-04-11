@@ -1,0 +1,7 @@
+query getCurrentUser($userId: String!) {
+    user(id: $userId){
+        userName
+        gender
+        score
+    }
+}

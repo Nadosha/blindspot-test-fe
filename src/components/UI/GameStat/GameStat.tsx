@@ -6,19 +6,19 @@ import {colors} from "@UI/GameStat/GameStat.types";
 const GameStatData = [
     {
         round: 1,
-        state: 'passed'
+        state: 'current'
     },
     {
         round: 2,
-        state: 'failed'
+        state: 'unstarted'
     },
     {
         round: 3,
-        state: 'passed'
+        state: 'unstarted'
     },
     {
         round: 4,
-        state: 'current'
+        state: 'unstarted'
     },
     {
         round: 5,

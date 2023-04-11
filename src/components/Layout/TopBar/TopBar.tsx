@@ -1,19 +1,34 @@
-import {Wrapper} from "@Components/Layout/TopBar/TopBar.styles";
+import {LogoutBtn, Wrapper} from "@Components/Layout/TopBar/TopBar.styles";
 import UserInfo from "@UI/UserInfo";
 import GameStat from "@UI/GameStat";
+import {useAuth} from "@API/auth";
+import {getUserAvatar} from "@Utils/getUserAvatar";
+
+import {unregisterAuthToken} from "@Utils/Cookies";
+import {CiLogout} from "react-icons/ci";
 
 const TopBar = () => {
-    const user = {
-        avatar: 'https://i.pinimg.com/564x/65/56/08/6556085337184f56dab477ebfcbf67a7.jpg',
-        userName: 'Andrii Nadosha',
-        userScore: 23
-    }
-    return (
+    const { isSignedIn, data } = useAuth()
+
+    const currentUser = {
+        gender: data?.user.gender,
+        userName: data?.user.userName,
+        userScore: data?.user.score,
+    };
+
+    const logout = () => {
+        unregisterAuthToken();
+    };
+
+    return isSignedIn ? (
         <Wrapper>
-            <UserInfo avatar={user.avatar} userName={user.userName} userScore={user.userScore}/>
+            <UserInfo avatar={getUserAvatar(currentUser.gender)} userName={currentUser.userName} userScore={currentUser.userScore}/>
+            <LogoutBtn type="text" onClick={logout}>
+                <CiLogout style={{fontSize: '24px', alignSelf: 'center'}}/> Logout
+            </LogoutBtn>
             <GameStat/>
         </Wrapper>
-    )
+    ) : <></>
 };
 
 export default TopBar;

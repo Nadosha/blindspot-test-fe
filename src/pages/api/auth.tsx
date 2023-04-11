@@ -1,9 +1,17 @@
+import React, {useEffect} from "react";
 import  { useState, useContext, createContext } from 'react'
 import {
     ApolloProvider,
     gql,
 } from '@apollo/client'
 import {client} from "./graphql-config";
+import {
+    useCreateUserMutation,
+    useGetCurrentUserQuery
+} from "../../codegen/generated/graphql";
+import {getAuthToken, registerAuthToken, unregisterAuthToken} from "@Utils/Cookies";
+import {ROUTES} from "@Utils/routes";
+import {useRouter} from "next/router";
 
 const authContext = createContext(undefined);
 
@@ -21,48 +29,52 @@ export function AuthProvider({ children }) {
 
 export const useAuth = () =>  useContext(authContext);
 
+
+
 const useProvideAuth = () => {
-    const [authToken, setAuthToken] = useState(null)
+    const authAuthToken = getAuthToken();
+    const router = useRouter();
 
-    const isSignedIn = !!authToken;
+    const {data} = useGetCurrentUserQuery({
+        variables: {
+            userId: authAuthToken
+        },
+        skip: !authAuthToken
+    });
 
-    const getAuthHeaders = () => {
-        if (!authToken) return null
+    const isSignedIn = !!authAuthToken;
 
-        return {
-            authorization: `Bearer ${authToken}`,
-        }
-    }
+    const [createUser] = useCreateUserMutation();
 
-    const signIn = async ({ username, password }) => {
-        const LoginMutation = gql`
-            mutation signin($username: String!, $password: String!) {
-                login(username: $username, password: $password) {
-                    token
+    const signUp = async ({ username, password, gender}) => {
+        try {
+            const result = await createUser({
+                variables: {
+                    user: {
+                        userName: username,
+                        password: password,
+                        gender: gender,
+                    }
                 }
+            });
+
+            if(result.data?.createUser.userId) {
+                registerAuthToken(result.data?.createUser.userId)
+                await router.push(ROUTES.INDEX);
             }
-        `
-
-        const result = await client.mutate({
-            mutation: LoginMutation,
-            variables: { username, password },
-        })
-
-        console.log(result)
-
-        if (result?.data?.login?.token) {
-            setAuthToken(result.data.login.token)
+        } catch (er) {
+            console.log(er)
         }
     }
 
     const signOut = () => {
-        setAuthToken(null)
+        unregisterAuthToken()
     }
 
     return {
-        setAuthToken,
+        data,
         isSignedIn,
-        signIn,
+        signUp,
         signOut,
     }
 }

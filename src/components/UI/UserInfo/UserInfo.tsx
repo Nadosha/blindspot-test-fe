@@ -11,7 +11,6 @@ const UserInfo = (user: UserProps) => {
                 <S.UserName>{user.userName}</S.UserName>
                 <S.UserScore>Score: {user.userScore}</S.UserScore>
             </S.Info>
-
         </S.Wrapper>
     )
 }
