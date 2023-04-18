@@ -12,6 +12,6 @@ generates:
       withHooks: true
       withHOC: false
       withComponent: false
-  arc/codegen/generated/graphql.schema.json:
+  codegen/generated/graphql.schema.json:
     plugins:
       - 'introspection'

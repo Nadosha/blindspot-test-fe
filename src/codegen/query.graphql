@@ -1,7 +1,36 @@
 query getCurrentUser($userId: String!) {
     user(id: $userId){
+        _id
         userName
         gender
         score
+    }
+}
+
+query getCurrentGame($user: String!) {
+    currentGame(user: $user) {
+        _id
+        user
+        isCompleted
+        currentRound
+        rounds {
+            _id
+            isCompleted
+            isCorrect
+            requestedAlbum {
+                albumID
+                title
+                artist
+                artistID
+                cover
+            }
+            albums {
+                albumID
+                title
+                artist
+                artistID
+                cover
+            }
+        }
     }
 }

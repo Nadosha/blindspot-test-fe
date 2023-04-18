@@ -2,7 +2,6 @@ import { Button, Form, Input } from "antd";
 import { useState } from "react";
 import { CircleImg } from "@UI/UserInfo/UserInfo.styles";
 import * as S from "./Signup.styles";
-import { useCreateUserMutation } from "../../codegen/generated/graphql";
 import { useAuth } from "@API/auth";
 
 const onFinishFailed = (errorInfo) => {

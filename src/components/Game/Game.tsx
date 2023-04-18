@@ -1,71 +1,100 @@
 import Card from "@UI/Card";
 import * as S from "./Game.styles";
-import React, { useState } from "react";
-import { Button } from "antd";
-const Fake_Data = [
-  {
-    id: "0",
-    artist: "Jackson",
-    album: "Happy",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "1",
-    artist: "Mark",
-    album: "Dancing",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "2",
-    artist: "Nick",
-    album: "Night",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "3",
-    artist: "Nirvana",
-    album: "Today",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "4",
-    artist: "Metallica",
-    album: "Is not Over",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "5",
-    artist: "Rolling",
-    album: "Anybody",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "6",
-    artist: "Coircle",
-    album: "Save my",
-    cover: "https://via.placeholder.com/400x400",
-  },
-  {
-    id: "7",
-    artist: "Jenny",
-    album: "Baby",
-    cover: "https://via.placeholder.com/400x400",
-  },
-];
+import React, { ChangeEvent, useState } from "react";
+import { Button, Modal } from "antd";
+import { useAuth } from "@API/auth";
+import {
+  Album,
+  GetCurrentGameDocument,
+  useCreateGameMutation,
+  useGetCurrentGameQuery,
+  useUpdateGameMutation,
+} from "../../codegen/generated/graphql";
 
 const Game = () => {
-  const [gameStarted, setGameStarted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<any | undefined>(undefined);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState<boolean>(false);
 
-  const selectAlbum = (evt: React.MouseEvent<HTMLElement>, item: any) => {
-    if (!selectedItem) setSelectedItem(item.id);
-    else alert("It looks like you've run out of choices. Sorry Bro!");
+  const { data: UserData } = useAuth();
+  const {
+    data: GameData,
+    loading,
+    error,
+  } = useGetCurrentGameQuery({
+    variables: {
+      user: UserData.user._id,
+    },
+  });
+  const [createGameMutation] = useCreateGameMutation({
+    refetchQueries: [
+      { query: GetCurrentGameDocument, variables: { user: UserData.user._id } },
+    ],
+    variables: {
+      game: {
+        user: UserData.user._id,
+      },
+    },
+  });
+
+  const [updateGameMutation] = useUpdateGameMutation({
+    refetchQueries: [
+      { query: GetCurrentGameDocument, variables: { user: UserData.user._id } },
+    ],
+  });
+
+  const handleChange = async (evt: ChangeEvent<HTMLInputElement>) => {
+    evt.preventDefault();
+    await createGameMutation();
   };
 
-  if (!gameStarted) {
+  const selectAlbum = (evt: React.MouseEvent<HTMLElement>, item: Album) => {
+    if (!selectedItem) {
+      setSelectedItem(item.albumID);
+
+      if (
+        !currentRound ||
+        item.albumID === currentRound.requestedAlbum.albumID
+      ) {
+        setIsCorrectAnswer(!isCorrectAnswer);
+      }
+    } else alert("It looks like you've run out of choices. Sorry Bro!");
+  };
+
+  const currentRound =
+    GameData?.currentGame?.rounds[GameData?.currentGame?.currentRound - 1];
+
+  const nextHendler = async (evt: React.MouseEvent<HTMLElement>) => {
+    const updateDataInput = {
+      _id: GameData?.currentGame?._id,
+      isCompleted: false,
+      round: {
+        _id: currentRound?._id,
+        isCompleted: true,
+        isCorrect: isCorrectAnswer,
+      },
+    };
+    try {
+      await updateGameMutation({
+        variables: {
+          updateGameInput: { ...updateDataInput },
+        },
+      });
+      if (GameData?.currentGame?.currentRound >= 5) {
+        setIsModalOpen(true);
+      }
+
+      setSelectedItem(false);
+      setIsCorrectAnswer(false);
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+  if (!GameData?.currentGame) {
     return (
       <S.ButtonWrapper>
-        <Button type={"primary"} onClick={() => setGameStarted(!gameStarted)}>
+        <Button type={"primary"} onClick={handleChange}>
           Start New Game
         </Button>
       </S.ButtonWrapper>
@@ -76,26 +105,38 @@ const Game = () => {
     <S.Wrapper>
       <S.Heading>
         <h3>
-          <small>Guess Artist of album:</small> {Fake_Data[0].album}
+          <small>Guess Artist of album: </small>
+          {currentRound.requestedAlbum.title}
         </h3>
         {!!selectedItem && (
           <S.Controllers>
-            <Button>Next Level</Button>
+            <Button onClick={nextHendler}>Next Level</Button>
           </S.Controllers>
         )}
       </S.Heading>
 
       <S.GameBoard>
-        {Fake_Data.map((i, key) => (
+        {currentRound.albums.map((i, key) => (
           <Card
             item={i}
-            isSelected={selectedItem === i.id}
-            isCorrect={!!selectedItem && Fake_Data[1].id === i.id}
+            isSelected={selectedItem === i.albumID}
+            isCorrect={
+              !!selectedItem &&
+              currentRound.requestedAlbum.albumID === i.albumID
+            }
             handler={(evt) => selectAlbum(evt, i)}
             key={key}
           />
         ))}
       </S.GameBoard>
+      <Modal
+        title="Basic Modal"
+        open={isModalOpen}
+        onOk={() => setIsModalOpen(false)}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <h3>Game Over</h3>
+      </Modal>
     </S.Wrapper>
   );
 };

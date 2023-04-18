@@ -7,3 +7,12 @@ mutation createUser($user: CreateUserInput!){
         score
     }
 }
+
+mutation createGame($game: CreateGameInput!){
+    createGame(createGameInput: $game)
+}
+
+mutation updateGame($updateGameInput: UpdateGameInput!){
+    updateGame(updateGameInput: $updateGameInput)
+}
+

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es5",
     "lib": [
       "dom",
       "dom.iterable",
@@ -8,10 +8,11 @@
     ],
     "allowJs": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -20,13 +21,30 @@
     "incremental": true,
     "baseUrl": "./",
     "paths": {
-      "@Components/*": ["src/components/*"],
-      "@Utils/*": ["src/utils/*"],
-      "@Styles/*": ["src/styles/*"],
-      "@UI/*": ["src/components/UI/*"],
-      "@API/*": ["src/pages/api/*"],
-    }
+      "@Components/*": [
+        "src/components/*"
+      ],
+      "@Utils/*": [
+        "src/utils/*"
+      ],
+      "@Styles/*": [
+        "src/styles/*"
+      ],
+      "@UI/*": [
+        "src/components/UI/*"
+      ],
+      "@API/*": [
+        "src/pages/api/*"
+      ]
+    },
+    "noEmit": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
